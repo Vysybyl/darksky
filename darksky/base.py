@@ -18,6 +18,8 @@ class BaseWeather(object):
 
     def __iter__(self):
         return iter(self.data)
+    def __repr__(self):
+        return '%s([%d])' % (self.__class__.__name__, len(self.data))
 
 
 class AutoInit(object):
@@ -40,3 +42,7 @@ class AutoInit(object):
 
     def __iter__(self):
         return iter(self.__dict__.items())
+
+
+    def __repr__(self):
+        return '%s(%s)' % (self.__class__.__name__, getattr(self, 'time', ''))
