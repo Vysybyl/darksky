@@ -1,10 +1,11 @@
-import pytz
 from datetime import datetime
 
-from .utils import undo_snake_case_key, get_datetime_from_unix
+import pytz
+
+from .utils import get_datetime_from_unix, undo_snake_case_key
 
 
-class BaseWeather(object):
+class BaseWeather:
     summary: str
     icon: str
     data_class: object
@@ -14,13 +15,17 @@ class BaseWeather(object):
         self.icon = icon
 
         assert self.data_class is not None
-        self.data = [self.data_class(timezone=timezone, **item) for item in (data or [])]
+        self.data = [self.data_class(timezone=timezone, **item)
+                     for item in (data or [])]
 
+    def __repr__(self):
+        return '%s([%d])' % (self.__class__.__name__, len(self.data))
+    
     def __iter__(self):
         return iter(self.data)
 
 
-class AutoInit(object):
+class AutoInit:
 
     def __init__(self, **params):
         try:
@@ -31,7 +36,10 @@ class AutoInit(object):
         for field in self.__annotations__:
             api_field = undo_snake_case_key(field)
             if self.__annotations__[field] == datetime:
-                params[api_field] = get_datetime_from_unix(params.get(api_field), timezone)
+                params[api_field] = get_datetime_from_unix(
+                    params.get(api_field),
+                    timezone
+                )
 
             if api_field in params:
                 setattr(self, field, params.get(api_field))
@@ -40,3 +48,6 @@ class AutoInit(object):
 
     def __iter__(self):
         return iter(self.__dict__.items())
+
+    def __repr__(self):
+        return '%s(%s)' % (self.__class__.__name__, getattr(self, 'time', ''))

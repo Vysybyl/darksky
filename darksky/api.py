@@ -1,16 +1,14 @@
 from datetime import datetime
 
 import aiohttp
-import requests
 
-from .exceptions import DarkSkyException
 from .forecast import Forecast
 from .request_manager import (BaseRequestManger, RequestManger,
                               RequestMangerAsync)
 from .types import languages, units, weather
 
 
-class BaseDarkSky(object):
+class BaseDarkSky:
     HOST = "https://api.darksky.net/forecast"
 
     def __init__(self, api_key: str):
@@ -23,8 +21,9 @@ class BaseDarkSky(object):
         longitude: float,
         extend: bool = None,
         lang=languages.ENGLISH,
-        units=units.AUTO,
+        values_units=units.AUTO,
         exclude: [weather] = None,
+        timezone: str = None,
     ):
         raise NotImplementedError
 
@@ -35,8 +34,9 @@ class BaseDarkSky(object):
         time: datetime,
         extend: bool = False,
         lang=languages.ENGLISH,
-        units=units.AUTO,
+        values_units=units.AUTO,
         exclude: [weather] = None,
+        timezone: str = None,
     ):
         raise NotImplementedError
 
@@ -48,14 +48,13 @@ class BaseDarkSky(object):
                 latitude=latitude,
                 longitude=longitude,
             )
-        else:
-            return "{host}/{api_key}/{latitude},{longitude},{time}".format(
-                api_key=self.api_key,
-                host=self.HOST,
-                latitude=latitude,
-                longitude=longitude,
-                time=time,
-            )
+        return "{host}/{api_key}/{latitude},{longitude},{time}".format(
+            api_key=self.api_key,
+            host=self.HOST,
+            latitude=latitude,
+            longitude=longitude,
+            time=time,
+        )
 
 
 class DarkSky(BaseDarkSky):
@@ -69,7 +68,7 @@ class DarkSky(BaseDarkSky):
         longitude: float,
         extend: bool = None,
         lang=languages.ENGLISH,
-        units=units.AUTO,
+        values_units=units.AUTO,
         exclude: [weather] = None,
         timezone: str = None,
     ):
@@ -78,7 +77,7 @@ class DarkSky(BaseDarkSky):
             url=url,
             extend=weather.HOURLY if extend else None,
             lang=lang,
-            units=units,
+            units=values_units,
             exclude=exclude,
             timezone=timezone,
         )
@@ -91,7 +90,7 @@ class DarkSky(BaseDarkSky):
         time: datetime,
         extend: bool = False,
         lang=languages.ENGLISH,
-        units=units.AUTO,
+        values_units=units.AUTO,
         exclude: [weather] = None,
         timezone: str = None,
     ):
@@ -100,7 +99,7 @@ class DarkSky(BaseDarkSky):
             url=url,
             extend=weather.HOURLY if extend else None,
             lang=lang,
-            units=units,
+            units=values_units,
             exclude=exclude,
             timezone=timezone,
         )
@@ -125,7 +124,7 @@ class DarkSkyAsync(BaseDarkSky):
         longitude: float,
         extend: bool = None,
         lang=languages.ENGLISH,
-        units=units.AUTO,
+        values_units=units.AUTO,
         exclude: [weather] = None,
         timezone: str = None,
     ):
@@ -134,7 +133,7 @@ class DarkSkyAsync(BaseDarkSky):
             url=url,
             extend=weather.HOURLY if extend else None,
             lang=lang,
-            units=units,
+            units=values_units,
             exclude=exclude,
             timezone=timezone,
         )
@@ -147,7 +146,7 @@ class DarkSkyAsync(BaseDarkSky):
         time: datetime,
         extend: bool = False,
         lang=languages.ENGLISH,
-        units=units.AUTO,
+        values_units=units.AUTO,
         exclude: [weather] = None,
         timezone: str = None,
     ):
@@ -156,7 +155,7 @@ class DarkSkyAsync(BaseDarkSky):
             url=url,
             extend=weather.HOURLY if extend else None,
             lang=lang,
-            units=units,
+            units=values_units,
             exclude=exclude,
             timezone=timezone,
         )
